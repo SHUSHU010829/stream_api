@@ -1,17 +1,26 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import colors from 'colors';
+import productsRoutes from './routes/product.route.js';
+import dotenv from 'dotenv';
 
-import usersRoutes from './routes/users.js';
-
+dotenv.config();
 const app = express();
-const PORT = 5001;
 
+// Middleware
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/users', usersRoutes);
-
+// Routes
+app.use('/api/products', productsRoutes);
 app.get('/', (req, res) => {
     res.send('Hello from Homepage')
 })
 
-app.listen(PORT, () => console.log(`Server is running on port: http://localhost:${PORT}`))
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("[INFO] MongoDB Atlas is connected".blue))
+  .catch(err => console.log(`[INFO] MongoDB Atlas is connected failed: ${err}`.red));
+
+const PORT = 5001;
+app.listen(PORT, () => console.log(`[INFO] Server is running on port: http://localhost:${PORT}`.blue))
