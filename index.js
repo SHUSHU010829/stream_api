@@ -18,9 +18,14 @@ app.get('/', (req, res) => {
     res.send('Hello from Homepage')
 })
 
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("[INFO] MongoDB Atlas is connected".blue))
   .catch(err => console.log(`[INFO] MongoDB Atlas is connected failed: ${err}`.red));
 
-const PORT = 5001;
-app.listen(PORT, () => console.log(`[INFO] Server is running on port: http://localhost:${PORT}`.blue))
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`[INFO] Server is start running`.blue))
