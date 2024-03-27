@@ -1,9 +1,9 @@
 const router = express.Router();
 import express from "express";
 
-import { getMessageBoard, getMessageBoard, createMessageBoard, updateMessageBoard, deleteMessageBoard } from "../controllers/messageBoard.controller.js";
+import { getMessageBoards, getMessageBoard, createMessageBoard, updateMessageBoard, deleteMessageBoard } from "../controllers/messageBoard.controller.js";
 
-router.get("/", getMessageBoard);
+router.get("/", getMessageBoards);
 
 router.get("/:id", getMessageBoard);
 
