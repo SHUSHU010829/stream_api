@@ -4,7 +4,9 @@ import mongoose from 'mongoose';
 
 import colors from 'colors';
 import productsRoutes from './routes/product.route.js';
+import messageBoardRoutes from './routes/messageBoard.route.js';
 import dotenv from 'dotenv';
+import createError from 'http-errors';
 dotenv.config();
 const app = express();
 
@@ -14,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
 app.use('/api/products', productsRoutes);
+app.use('/api/messageBoard', messageBoardRoutes);
 app.get('/', (req, res) => {
     res.send('Hello from Homepage')
 })
