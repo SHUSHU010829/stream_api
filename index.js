@@ -1,10 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
+
 import colors from 'colors';
 import productsRoutes from './routes/product.route.js';
 import dotenv from 'dotenv';
-
 dotenv.config();
 const app = express();
 
