@@ -9,6 +9,7 @@ import {
   deleteSong,
   deleteAllSongs,
   updateNowPlaying,
+  clearNowPlaying,
 } from "../controllers/songList.controller.js";
 
 router.get("/", getSongList);
@@ -20,6 +21,8 @@ router.post("/", createSong);
 router.put("/:id", updateSong);
 
 router.put("/start/:id", updateNowPlaying);
+
+router.put("/stop", clearNowPlaying);
 
 router.delete("/:id", deleteSong);
 

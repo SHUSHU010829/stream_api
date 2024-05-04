@@ -6,6 +6,7 @@ import {
   deleteDBSong,
   deleteDBAllSongs,
   updateDBNowPlaying,
+  clearDBNowPlaying,
 } from "../models/songList.model.js";
 
 export const getSongList = async (req, res) => {
@@ -77,6 +78,15 @@ export const deleteAllSongs = async (req, res) => {
     } else {
       res.status(200).json({ message: "歌曲刪除成功！" });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const clearNowPlaying = async (req, res) => {
+  try {
+    const status = await clearDBNowPlaying();
+    res.status(200).json(status);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
