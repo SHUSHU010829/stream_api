@@ -6,7 +6,6 @@ import {
   deleteDBSong,
   deleteDBAllSongs,
   updateDBNowPlaying,
-  clearDBNowPlaying,
 } from "../models/songList.model.js";
 
 export const getSongList = async (req, res) => {
