@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import colors from "colors";
 import createError from "http-errors";
 import dotenv from "dotenv";
+import cors from "cors";
 dotenv.config();
 
 import songListRoutes from "./routes/songList.route.js";
