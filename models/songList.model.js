@@ -59,16 +59,16 @@ export async function updateDBNowPlaying(id) {
     // Check if any record has now_playing as 1, if yes, update it to 0
     const checkQuery =
       "SELECT COUNT(*) AS count FROM song_list WHERE now_playing = 1";
-    const checkResult = await db.query(checkQuery);
+    const checkResult = await pool.query(checkQuery);
     if (checkResult[0].count > 0) {
-      await db.query(
+      await pool.query(
         "UPDATE song_list SET now_playing = 0 WHERE now_playing = 1"
       );
     }
 
     // Update the specified ID's now_playing to 1
     const updateQuery = "UPDATE song_list SET now_playing = 1 WHERE id = ?";
-    const updateResult = await db.query(updateQuery, [id]);
+    const updateResult = await pool.query(updateQuery, [id]);
 
     return updateResult.affectedRows;
   } catch (error) {
