@@ -16,7 +16,7 @@ export async function createDBSong(title, artist) {
     [title, artist]
   );
   const id = result.insertId;
-  return getSongById(id);
+  return getDBSongById(id);
 }
 
 export async function updateDBSong(id, title, artist) {
