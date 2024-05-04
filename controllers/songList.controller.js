@@ -83,13 +83,14 @@ export const deleteAllSongs = async (req, res) => {
   }
 };
 
-export const clearNowPlaying = async (req, res) => {
+export const stopNowPlaying = async (req, res) => {
+  const { id } = req.params;
   try {
-    const status = await clearDBNowPlaying();
+    const status = await updateDBNowPlaying(id, 0); // 将特定id的歌曲的now_playing更改为0
     if (status === 0) {
-      throw createError(404, "清除播放中歌曲失敗！");
+      throw createError(404, "找不到歌曲或歌曲不在播放中！");
     } else {
-      res.status(200).json({ message: "目前沒有播放歌曲！" });
+      res.status(200).json({ message: "歌曲已停止播放！" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

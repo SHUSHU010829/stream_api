@@ -5,18 +5,6 @@ export async function getDBSongList() {
   return rows;
 }
 
-export async function clearDBNowPlaying() {
-  try {
-    // Update all songs' now_playing to 0
-    const updateQuery = "UPDATE song_list SET now_playing = 0";
-    const updateResult = await pool.query(updateQuery);
-
-    return updateResult.affectedRows;
-  } catch (error) {
-    throw new Error("Failed to clear now playing status: " + error.message);
-  }
-}
-
 export async function getDBSongById(id) {
   const [rows] = await pool.query("SELECT * FROM song_list WHERE id = ?", [id]);
   return rows[0];
@@ -66,21 +54,23 @@ export async function deleteDBAllSongs() {
   return result.affectedRows;
 }
 
-export async function updateDBNowPlaying(id) {
+export async function updateDBNowPlaying(id, nowPlayingValue = 1) {
   try {
-    // Check if any record has now_playing as 1, if yes, update it to 0
-    const checkQuery =
-      "SELECT COUNT(*) AS count FROM song_list WHERE now_playing = 1";
-    const checkResult = await pool.query(checkQuery);
-    if (checkResult[0].count > 0) {
-      await pool.query(
-        "UPDATE song_list SET now_playing = 0 WHERE now_playing = 1"
-      );
+    if (nowPlayingValue !== 0) {
+      // Check if any record has now_playing as 1, if yes, update it to 0
+      const checkQuery =
+        "SELECT COUNT(*) AS count FROM song_list WHERE now_playing = 1";
+      const checkResult = await pool.query(checkQuery);
+      if (checkResult[0].count > 0) {
+        await pool.query(
+          "UPDATE song_list SET now_playing = 0 WHERE now_playing = 1"
+        );
+      }
     }
 
-    // Update the specified ID's now_playing to 1
-    const updateQuery = "UPDATE song_list SET now_playing = 1 WHERE id = ?";
-    const updateResult = await pool.query(updateQuery, [id]);
+    // Update the specified ID's now_playing
+    const updateQuery = "UPDATE song_list SET now_playing = ? WHERE id = ?";
+    const updateResult = await pool.query(updateQuery, [nowPlayingValue, id]);
 
     return updateResult.affectedRows;
   } catch (error) {
