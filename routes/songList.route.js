@@ -16,13 +16,13 @@ router.get("/", getSongList);
 
 router.get("/:id", getSongById);
 
+router.get("/stop", clearNowPlaying);
+
 router.post("/", createSong);
 
 router.put("/:id", updateSong);
 
 router.put("/start/:id", updateNowPlaying);
-
-router.put("/stop", clearNowPlaying);
 
 router.delete("/:id", deleteSong);
 

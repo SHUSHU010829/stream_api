@@ -5,6 +5,18 @@ export async function getDBSongList() {
   return rows;
 }
 
+export async function clearDBNowPlaying() {
+  try {
+    // Update all songs' now_playing to 0
+    const updateQuery = "UPDATE song_list SET now_playing = 0";
+    const updateResult = await pool.query(updateQuery);
+
+    return updateResult.affectedRows;
+  } catch (error) {
+    throw new Error("Failed to clear now playing status: " + error.message);
+  }
+}
+
 export async function getDBSongById(id) {
   const [rows] = await pool.query("SELECT * FROM song_list WHERE id = ?", [id]);
   return rows[0];
@@ -73,16 +85,5 @@ export async function updateDBNowPlaying(id) {
     return updateResult.affectedRows;
   } catch (error) {
     throw new Error("Failed to update now playing status: " + error.message);
-  }
-}
-
-export async function clearDBNowPlaying() {
-  try {
-    const updateQuery = "UPDATE song_list SET now_playing = 0";
-    const updateResult = await pool.query(updateQuery);
-
-    return updateResult.affectedRows;
-  } catch (error) {
-    throw new Error("Failed to clear now playing status: " + error.message);
   }
 }
