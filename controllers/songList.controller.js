@@ -86,7 +86,11 @@ export const deleteAllSongs = async (req, res) => {
 export const clearNowPlaying = async (req, res) => {
   try {
     const status = await clearDBNowPlaying();
-    res.status(200).json(status);
+    if (status === 0) {
+      throw createError(404, "清除播放中歌曲失敗！");
+    } else {
+      res.status(200).json({ message: "目前沒有播放歌曲！" });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
