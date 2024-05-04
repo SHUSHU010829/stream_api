@@ -5,6 +5,7 @@ import {
   updateDBSong,
   deleteDBSong,
   deleteDBAllSongs,
+  updateDBNowPlaying,
 } from "../models/songList.model.js";
 
 export const getSongList = async (req, res) => {
@@ -75,6 +76,20 @@ export const deleteAllSongs = async (req, res) => {
       throw createError(404, "沒有歌曲可以刪除！");
     } else {
       res.status(200).json({ message: "歌曲刪除成功！" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateNowPlaying = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const status = await updateDBNowPlaying(id);
+    if (status === 0) {
+      throw createError(404, "找不到歌曲！");
+    } else {
+      res.status(200).json({ message: "歌曲開始播放！" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
