@@ -30,11 +30,11 @@ export const getSongById = async (req, res) => {
 
 export const createSong = async (req, res) => {
   const { title, artist } = req.body;
-  if (!title || !artist || title.trim() === "" || !artist.trim() === "") {
+  if (!title || !artist) {
     throw createError(400, "歌曲名稱或歌手名稱不得為空！");
   }
   try {
-    const newSong = await createDBSong(title.trim(), artist.trim());
+    const newSong = await createDBSong(title, artist);
     res.status(201).json(newSong);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -45,7 +45,7 @@ export const updateSong = async (req, res) => {
   const { id } = req.params;
   const { title, artist } = req.body;
   try {
-    const status = await updateDBSong(id, title.trim(), artist.trim());
+    const status = await updateDBSong(id, title, artist);
     if (status === 0) {
       throw createError(404, "找不到歌曲！");
     } else {
