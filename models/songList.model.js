@@ -56,19 +56,25 @@ export async function deleteDBAllSongs() {
 
 export async function updateDBNowPlaying(id) {
   try {
-    // Check if any record has now_playing as 1, if yes, update it to 0
-    const checkQuery =
-      "SELECT COUNT(*) AS count FROM song_list WHERE now_playing = 1";
-    const checkResult = await pool.query(checkQuery);
-    if (checkResult[0].count > 0) {
-      await pool.query(
-        "UPDATE song_list SET now_playing = 0 WHERE now_playing = 1"
-      );
+    // Check if the specified ID's now_playing is already 1
+    const checkNowPlayingQuery =
+      "SELECT now_playing FROM song_list WHERE id = ?";
+    const [checkNowPlayingResult] = await pool.query(checkNowPlayingQuery, [
+      id,
+    ]);
+    const nowPlayingStatus = checkNowPlayingResult[0].now_playing;
+
+    if (nowPlayingStatus === 1) {
+      // If now_playing is already 1, update it to 0
+      const resetNowPlayingQuery =
+        "UPDATE song_list SET now_playing = 0 WHERE id = ?";
+      await pool.query(resetNowPlayingQuery, [id]);
     }
 
     // Update the specified ID's now_playing to 1
-    const updateQuery = "UPDATE song_list SET now_playing = 1 WHERE id = ?";
-    const updateResult = await pool.query(updateQuery, [id]);
+    const updateNowPlayingQuery =
+      "UPDATE song_list SET now_playing = 1 WHERE id = ?";
+    const updateResult = await pool.query(updateNowPlayingQuery, [id]);
 
     return updateResult.affectedRows;
   } catch (error) {
