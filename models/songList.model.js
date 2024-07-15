@@ -10,6 +10,18 @@ export async function getDBSongById(id) {
   return rows[0];
 }
 
+export async function getDBOrderSongList() {
+  const [rows] = await pool.query("SELECT * FROM order_song");
+  return rows;
+}
+
+export async function getDBOrderSongById(id) {
+  const [rows] = await pool.query("SELECT * FROM order_song WHERE id = ?", [
+    id,
+  ]);
+  return rows[0];
+}
+
 export async function createDBSong(title, artist) {
   const [result] = await pool.query(
     "INSERT INTO song_list (title, artist) VALUES (?, ?)",
@@ -17,6 +29,15 @@ export async function createDBSong(title, artist) {
   );
   const id = result.insertId;
   return getDBSongById(id);
+}
+
+export async function createDBOrderSong(title) {
+  const [result] = await pool.query(
+    "INSERT INTO order_song (title) VALUES (?)",
+    [title]
+  );
+  const id = result.insertId;
+  return getDBOrderSongById(id);
 }
 
 export async function updateDBSong(id, title, artist) {
@@ -51,6 +72,18 @@ export async function deleteDBSong(id) {
 
 export async function deleteDBAllSongs() {
   const [result] = await pool.query("DELETE FROM song_list");
+  return result.affectedRows;
+}
+
+export async function deleteDBOrderSong(id) {
+  const [result] = await pool.query("DELETE FROM order_song WHERE id = ?", [
+    id,
+  ]);
+  return result.affectedRows;
+}
+
+export async function deleteDBOrderAllSongs() {
+  const [result] = await pool.query("DELETE FROM order_song");
   return result.affectedRows;
 }
 

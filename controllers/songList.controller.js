@@ -6,11 +6,24 @@ import {
   deleteDBSong,
   deleteDBAllSongs,
   updateDBNowPlaying,
+  deleteDBOrderSong,
+  deleteDBOrderAllSongs,
+  getDBOrderSongList,
+  createDBOrderSong,
 } from "../models/songList.model.js";
 
 export const getSongList = async (req, res) => {
   try {
     const songs = await getDBSongList();
+    res.status(200).json(songs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getOrderSongList = async (req, res) => {
+  try {
+    const songs = await getDBOrderSongList();
     res.status(200).json(songs);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -34,6 +47,19 @@ export const createSong = async (req, res) => {
   }
   try {
     const newSong = await createDBSong(title, artist);
+    res.status(201).json(newSong);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const createOrderSong = async (req, res) => {
+  const { title } = req.body;
+  if (!title) {
+    throw createError(400, "要打歌名啊！孩紙！");
+  }
+  try {
+    const newSong = await createDBOrderSong(title);
     res.status(201).json(newSong);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -72,6 +98,33 @@ export const deleteSong = async (req, res) => {
 export const deleteAllSongs = async (req, res) => {
   try {
     const status = await deleteDBAllSongs();
+    if (status === 0) {
+      throw createError(404, "沒有歌曲可以刪除！");
+    } else {
+      res.status(200).json({ message: "歌曲刪除成功！" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteOrderSong = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const status = await deleteDBOrderSong(id);
+    if (status === 0) {
+      throw createError(404, "找不到歌曲！");
+    } else {
+      res.status(200).json({ message: "歌曲刪除成功！" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteAllOrderSongs = async (req, res) => {
+  try {
+    const status = await deleteDBOrderAllSongs();
     if (status === 0) {
       throw createError(404, "沒有歌曲可以刪除！");
     } else {
