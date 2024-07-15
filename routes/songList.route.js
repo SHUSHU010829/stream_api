@@ -32,12 +32,12 @@ router.delete("/:id", deleteSong);
 
 router.delete("/", deleteAllSongs);
 
-router.post("/order", createOrderSong);
+router.post("/order/", createOrderSong);
 
-router.get("/order", getOrderSongList);
+router.get("/order/", getOrderSongList);
 
 router.delete("/order/:id", deleteOrderSong);
 
-router.delete("/order", deleteAllOrderSongs);
+router.delete("/order/", deleteAllOrderSongs);
 
 export default router;
