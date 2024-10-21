@@ -15,7 +15,7 @@ export const createMsg = async (req, res) => {
     throw createError(400, "訊息不得為空！");
   }
   try {
-    const newMsg = await createDBMsg(title, artist);
+    const newMsg = await createDBMsg(content);
     res.status(201).json(newMsg);
   } catch (error) {
     res.status(500).json({ message: error.message });
