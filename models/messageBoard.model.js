@@ -11,5 +11,5 @@ export async function createDBMsg(content) {
     [content]
   );
   const id = result.insertId;
-  return getDBOrderSongById(id);
+  return getDBAllMsg(id);
 }
