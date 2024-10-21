@@ -7,6 +7,7 @@ import cors from "cors";
 dotenv.config();
 
 import songListRoutes from "./routes/songList.route.js";
+import messageBoardRoutes from "./routes/messageBoard.route.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/songList", songListRoutes);
+app.use("/messageBoard", messageBoardRoutes);
 
 // Error Handler
 app.use((err, req, res, next) => {
