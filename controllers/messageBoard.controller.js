@@ -11,7 +11,7 @@ export const getAllMsg = async (req, res) => {
 
 export const createMsg = async (req, res) => {
   const { content } = req.body;
-  if (!content.trim()) {
+  if (!content || content.trim() === "") {
     throw createError(400, "訊息不得為空！");
   }
   try {
