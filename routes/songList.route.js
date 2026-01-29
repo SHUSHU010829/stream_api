@@ -3,11 +3,18 @@ import express from "express";
 
 import {
   getSongList,
+  getActiveSongList,
+  getSongHistory,
   getSongById,
   createSong,
   updateSong,
   deleteSong,
   deleteAllSongs,
+  hardDeleteSong,
+  hardDeleteAllSongs,
+  restoreSong,
+  updateSongOrder,
+  updateBatchSongOrder,
   updateNowPlaying,
   stopNowPlaying,
   createOrderSong,
@@ -17,6 +24,10 @@ import {
 } from "../controllers/songList.controller.js";
 
 router.get("/", getSongList);
+
+router.get("/active", getActiveSongList);
+
+router.get("/history", getSongHistory);
 
 router.get("/:id", getSongById);
 
@@ -28,9 +39,19 @@ router.put("/start/:id", updateNowPlaying);
 
 router.put("/stop/:id", stopNowPlaying);
 
+router.put("/restore/:id", restoreSong);
+
+router.put("/sort/:id", updateSongOrder);
+
+router.put("/sort", updateBatchSongOrder);
+
 router.delete("/:id", deleteSong);
 
 router.delete("/", deleteAllSongs);
+
+router.delete("/hard/:id", hardDeleteSong);
+
+router.delete("/hard", hardDeleteAllSongs);
 
 router.post("/order/", createOrderSong);
 

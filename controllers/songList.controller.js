@@ -1,10 +1,17 @@
 import {
   getDBSongList,
+  getDBActiveSongList,
+  getDBSongHistory,
   getDBSongById,
   createDBSong,
   updateDBSong,
   deleteDBSong,
   deleteDBAllSongs,
+  hardDeleteDBSong,
+  hardDeleteDBAllSongs,
+  restoreDBSong,
+  updateDBSongOrder,
+  updateDBBatchSongOrder,
   updateDBNowPlaying,
   deleteDBOrderSong,
   deleteDBOrderAllSongs,
@@ -15,6 +22,24 @@ import {
 export const getSongList = async (req, res) => {
   try {
     const songs = await getDBSongList();
+    res.status(200).json(songs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getActiveSongList = async (req, res) => {
+  try {
+    const songs = await getDBActiveSongList();
+    res.status(200).json(songs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSongHistory = async (req, res) => {
+  try {
+    const songs = await getDBSongHistory();
     res.status(200).json(songs);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -88,7 +113,7 @@ export const deleteSong = async (req, res) => {
     if (status === 0) {
       throw createError(404, "找不到歌曲！");
     } else {
-      res.status(200).json({ message: "歌曲刪除成功！" });
+      res.status(200).json({ message: "歌曲已歸檔！" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -101,8 +126,77 @@ export const deleteAllSongs = async (req, res) => {
     if (status === 0) {
       throw createError(404, "沒有歌曲可以刪除！");
     } else {
-      res.status(200).json({ message: "歌曲刪除成功！" });
+      res.status(200).json({ message: "歌曲已歸檔！" });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const hardDeleteSong = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const status = await hardDeleteDBSong(id);
+    if (status === 0) {
+      throw createError(404, "找不到歌曲！");
+    } else {
+      res.status(200).json({ message: "歌曲永久刪除成功！" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const hardDeleteAllSongs = async (req, res) => {
+  try {
+    const status = await hardDeleteDBAllSongs();
+    if (status === 0) {
+      throw createError(404, "沒有歌曲可以刪除！");
+    } else {
+      res.status(200).json({ message: "所有歌曲永久刪除成功！" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const restoreSong = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const status = await restoreDBSong(id);
+    if (status === 0) {
+      throw createError(404, "找不到歌曲！");
+    } else {
+      res.status(200).json({ message: "歌曲已恢復！" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateSongOrder = async (req, res) => {
+  const { id } = req.params;
+  const { sort_order } = req.body;
+  try {
+    const status = await updateDBSongOrder(id, sort_order);
+    if (status === 0) {
+      throw createError(404, "找不到歌曲！");
+    } else {
+      res.status(200).json({ message: "排序更新成功！" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateBatchSongOrder = async (req, res) => {
+  const { songs } = req.body; // [{id, sort_order}, ...]
+  try {
+    if (!songs || !Array.isArray(songs)) {
+      throw createError(400, "請提供歌曲排序陣列！");
+    }
+    const count = await updateDBBatchSongOrder(songs);
+    res.status(200).json({ message: `已更新 ${count} 首歌曲的排序！` });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

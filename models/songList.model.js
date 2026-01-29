@@ -5,6 +5,20 @@ export function getDBSongList() {
   return stmt.all();
 }
 
+export function getDBActiveSongList() {
+  const stmt = db.prepare(
+    "SELECT * FROM song_list WHERE status = 1 ORDER BY sort_order ASC, id ASC"
+  );
+  return stmt.all();
+}
+
+export function getDBSongHistory() {
+  const stmt = db.prepare(
+    "SELECT * FROM song_list WHERE status = 0 ORDER BY create_time DESC"
+  );
+  return stmt.all();
+}
+
 export function getDBSongById(id) {
   const stmt = db.prepare("SELECT * FROM song_list WHERE id = ?");
   return stmt.get(id);
@@ -61,15 +75,61 @@ export function updateDBSong(id, title, artist) {
 }
 
 export function deleteDBSong(id) {
-  const stmt = db.prepare("DELETE FROM song_list WHERE id = ?");
+  // 軟刪除：將 status 設為 0 (archived)
+  const stmt = db.prepare("UPDATE song_list SET status = 0 WHERE id = ?");
   const result = stmt.run(id);
   return result.changes;
 }
 
 export function deleteDBAllSongs() {
+  // 軟刪除：將所有歌曲的 status 設為 0 (archived)
+  const stmt = db.prepare("UPDATE song_list SET status = 0 WHERE status = 1");
+  const result = stmt.run();
+  return result.changes;
+}
+
+export function archiveDBAllSongs() {
+  // 歸檔所有活動歌曲（與 deleteDBAllSongs 相同）
+  return deleteDBAllSongs();
+}
+
+export function hardDeleteDBSong(id) {
+  // 真正刪除歌曲
+  const stmt = db.prepare("DELETE FROM song_list WHERE id = ?");
+  const result = stmt.run(id);
+  return result.changes;
+}
+
+export function hardDeleteDBAllSongs() {
+  // 真正刪除所有歌曲
   const stmt = db.prepare("DELETE FROM song_list");
   const result = stmt.run();
   return result.changes;
+}
+
+export function restoreDBSong(id) {
+  // 恢復歸檔的歌曲
+  const stmt = db.prepare("UPDATE song_list SET status = 1 WHERE id = ?");
+  const result = stmt.run(id);
+  return result.changes;
+}
+
+export function updateDBSongOrder(id, sortOrder) {
+  const stmt = db.prepare("UPDATE song_list SET sort_order = ? WHERE id = ?");
+  const result = stmt.run(sortOrder, id);
+  return result.changes;
+}
+
+export function updateDBBatchSongOrder(songs) {
+  // 批量更新排序：songs = [{id, sort_order}, ...]
+  const stmt = db.prepare("UPDATE song_list SET sort_order = ? WHERE id = ?");
+  const updateMany = db.transaction((items) => {
+    for (const item of items) {
+      stmt.run(item.sort_order, item.id);
+    }
+  });
+  updateMany(songs);
+  return songs.length;
 }
 
 export function deleteDBOrderSong(id) {
