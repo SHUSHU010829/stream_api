@@ -1,15 +1,12 @@
-import pool from "../database.js";
+import db from "../database.js";
 
-export async function getDBAllMsg() {
-  const [rows] = await pool.query("SELECT * FROM message_board");
-  return rows;
+export function getDBAllMsg() {
+  const stmt = db.prepare("SELECT * FROM message_board");
+  return stmt.all();
 }
 
-export async function createDBMsg(content) {
-  const [result] = await pool.query(
-    "INSERT INTO message_board (message) VALUES (?)",
-    [content]
-  );
-  const id = result.insertId;
-  return getDBAllMsg(id);
+export function createDBMsg(content) {
+  const stmt = db.prepare("INSERT INTO message_board (message) VALUES (?)");
+  const result = stmt.run(content);
+  return getDBAllMsg();
 }

@@ -1,11 +1,22 @@
-USE `stream`;
+-- SQLite Schema
 
-CREATE TABLE `song_list` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `song_title` VARCHAR(100),
-    `singer` VARCHAR(100),
-    `song_tags` JSON,
-    `now_playing` BOOLEAN,
-    PRIMARY KEY (`id`)
+CREATE TABLE IF NOT EXISTS song_list (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    song_title TEXT,
+    singer TEXT,
+    song_tags TEXT,
+    now_playing INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS order_song (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    title TEXT
+);
+
+CREATE TABLE IF NOT EXISTS message_board (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    message TEXT
 );

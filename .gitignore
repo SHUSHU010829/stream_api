@@ -38,3 +38,8 @@ next-env.d.ts
 .env
 
 package-lock.json
+
+# SQLite database
+*.db
+*.db-wal
+*.db-shm

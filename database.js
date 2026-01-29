@@ -1,16 +1,38 @@
-import mysql from "mysql2";
+import Database from "better-sqlite3";
+import path from "path";
+import { fileURLToPath } from "url";
 
-import dotenv from "dotenv";
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const pool = mysql
-  .createPool({
-    host: process.env.MYSQL_HOST,
-    port: process.env.MYSQL_PORT,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-  })
-  .promise();
+const dbPath = path.join(__dirname, "stream.db");
+const db = new Database(dbPath);
 
-export default pool;
+// Enable WAL mode for better performance
+db.pragma("journal_mode = WAL");
+
+// Initialize tables
+db.exec(`
+  CREATE TABLE IF NOT EXISTS song_list (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    song_title TEXT,
+    singer TEXT,
+    song_tags TEXT,
+    now_playing INTEGER DEFAULT 0
+  );
+
+  CREATE TABLE IF NOT EXISTS order_song (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    title TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS message_board (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    message TEXT
+  );
+`);
+
+export default db;
