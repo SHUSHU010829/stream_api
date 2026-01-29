@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS song_list (
     song_title TEXT,
     singer TEXT,
     song_tags TEXT,
-    now_playing INTEGER DEFAULT 0
+    now_playing INTEGER DEFAULT 0,
+    status INTEGER DEFAULT 1  -- 1: active (顯示), 0: archived (歷史紀錄)
 );
 
 CREATE TABLE IF NOT EXISTS order_song (

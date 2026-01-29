@@ -19,7 +19,8 @@ db.exec(`
     song_title TEXT,
     singer TEXT,
     song_tags TEXT,
-    now_playing INTEGER DEFAULT 0
+    now_playing INTEGER DEFAULT 0,
+    status INTEGER DEFAULT 1
   );
 
   CREATE TABLE IF NOT EXISTS order_song (
@@ -34,5 +35,12 @@ db.exec(`
     message TEXT
   );
 `);
+
+// Migration: Add status column if not exists
+const tableInfo = db.prepare("PRAGMA table_info(song_list)").all();
+const hasStatusColumn = tableInfo.some((col) => col.name === "status");
+if (!hasStatusColumn) {
+  db.exec("ALTER TABLE song_list ADD COLUMN status INTEGER DEFAULT 1");
+}
 
 export default db;
