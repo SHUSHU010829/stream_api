@@ -6,7 +6,9 @@ export function getDBSongList() {
 }
 
 export function getDBActiveSongList() {
-  const stmt = db.prepare("SELECT * FROM song_list WHERE status = 1");
+  const stmt = db.prepare(
+    "SELECT * FROM song_list WHERE status = 1 ORDER BY sort_order ASC, id ASC"
+  );
   return stmt.all();
 }
 
@@ -110,6 +112,24 @@ export function restoreDBSong(id) {
   const stmt = db.prepare("UPDATE song_list SET status = 1 WHERE id = ?");
   const result = stmt.run(id);
   return result.changes;
+}
+
+export function updateDBSongOrder(id, sortOrder) {
+  const stmt = db.prepare("UPDATE song_list SET sort_order = ? WHERE id = ?");
+  const result = stmt.run(sortOrder, id);
+  return result.changes;
+}
+
+export function updateDBBatchSongOrder(songs) {
+  // 批量更新排序：songs = [{id, sort_order}, ...]
+  const stmt = db.prepare("UPDATE song_list SET sort_order = ? WHERE id = ?");
+  const updateMany = db.transaction((items) => {
+    for (const item of items) {
+      stmt.run(item.sort_order, item.id);
+    }
+  });
+  updateMany(songs);
+  return songs.length;
 }
 
 export function deleteDBOrderSong(id) {

@@ -20,7 +20,8 @@ db.exec(`
     singer TEXT,
     song_tags TEXT,
     now_playing INTEGER DEFAULT 0,
-    status INTEGER DEFAULT 1
+    status INTEGER DEFAULT 1,
+    sort_order INTEGER DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS order_song (
@@ -41,6 +42,12 @@ const tableInfo = db.prepare("PRAGMA table_info(song_list)").all();
 const hasStatusColumn = tableInfo.some((col) => col.name === "status");
 if (!hasStatusColumn) {
   db.exec("ALTER TABLE song_list ADD COLUMN status INTEGER DEFAULT 1");
+}
+
+// Migration: Add sort_order column if not exists
+const hasSortOrderColumn = tableInfo.some((col) => col.name === "sort_order");
+if (!hasSortOrderColumn) {
+  db.exec("ALTER TABLE song_list ADD COLUMN sort_order INTEGER DEFAULT 0");
 }
 
 export default db;

@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS song_list (
     singer TEXT,
     song_tags TEXT,
     now_playing INTEGER DEFAULT 0,
-    status INTEGER DEFAULT 1  -- 1: active (顯示), 0: archived (歷史紀錄)
+    status INTEGER DEFAULT 1,  -- 1: active (顯示), 0: archived (歷史紀錄)
+    sort_order INTEGER DEFAULT 0  -- 自訂排序順序，數字越小越前面
 );
 
 CREATE TABLE IF NOT EXISTS order_song (

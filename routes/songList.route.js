@@ -13,6 +13,8 @@ import {
   hardDeleteSong,
   hardDeleteAllSongs,
   restoreSong,
+  updateSongOrder,
+  updateBatchSongOrder,
   updateNowPlaying,
   stopNowPlaying,
   createOrderSong,
@@ -38,6 +40,10 @@ router.put("/start/:id", updateNowPlaying);
 router.put("/stop/:id", stopNowPlaying);
 
 router.put("/restore/:id", restoreSong);
+
+router.put("/sort/:id", updateSongOrder);
+
+router.put("/sort", updateBatchSongOrder);
 
 router.delete("/:id", deleteSong);
 

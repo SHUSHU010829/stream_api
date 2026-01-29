@@ -10,6 +10,8 @@ import {
   hardDeleteDBSong,
   hardDeleteDBAllSongs,
   restoreDBSong,
+  updateDBSongOrder,
+  updateDBBatchSongOrder,
   updateDBNowPlaying,
   deleteDBOrderSong,
   deleteDBOrderAllSongs,
@@ -167,6 +169,34 @@ export const restoreSong = async (req, res) => {
     } else {
       res.status(200).json({ message: "歌曲已恢復！" });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateSongOrder = async (req, res) => {
+  const { id } = req.params;
+  const { sort_order } = req.body;
+  try {
+    const status = await updateDBSongOrder(id, sort_order);
+    if (status === 0) {
+      throw createError(404, "找不到歌曲！");
+    } else {
+      res.status(200).json({ message: "排序更新成功！" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateBatchSongOrder = async (req, res) => {
+  const { songs } = req.body; // [{id, sort_order}, ...]
+  try {
+    if (!songs || !Array.isArray(songs)) {
+      throw createError(400, "請提供歌曲排序陣列！");
+    }
+    const count = await updateDBBatchSongOrder(songs);
+    res.status(200).json({ message: `已更新 ${count} 首歌曲的排序！` });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
