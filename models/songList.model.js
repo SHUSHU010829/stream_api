@@ -1,111 +1,111 @@
-import pool from "../database.js";
+import db from "../database.js";
 
-export async function getDBSongList() {
-  const [rows] = await pool.query("SELECT * FROM song_list");
-  return rows;
+export function getDBSongList() {
+  const stmt = db.prepare("SELECT * FROM song_list");
+  return stmt.all();
 }
 
-export async function getDBSongById(id) {
-  const [rows] = await pool.query("SELECT * FROM song_list WHERE id = ?", [id]);
-  return rows[0];
+export function getDBSongById(id) {
+  const stmt = db.prepare("SELECT * FROM song_list WHERE id = ?");
+  return stmt.get(id);
 }
 
-export async function getDBOrderSongList() {
-  const [rows] = await pool.query("SELECT * FROM order_song");
-  return rows;
+export function getDBOrderSongList() {
+  const stmt = db.prepare("SELECT * FROM order_song");
+  return stmt.all();
 }
 
-export async function getDBOrderSongById(id) {
-  const [rows] = await pool.query("SELECT * FROM order_song WHERE id = ?", [
-    id,
-  ]);
-  return rows[0];
+export function getDBOrderSongById(id) {
+  const stmt = db.prepare("SELECT * FROM order_song WHERE id = ?");
+  return stmt.get(id);
 }
 
-export async function createDBSong(title, artist) {
-  const [result] = await pool.query(
-    "INSERT INTO song_list (title, artist) VALUES (?, ?)",
-    [title, artist]
+export function createDBSong(title, artist) {
+  const stmt = db.prepare(
+    "INSERT INTO song_list (song_title, singer) VALUES (?, ?)"
   );
-  const id = result.insertId;
-  return getDBSongById(id);
+  const result = stmt.run(title, artist);
+  return getDBSongById(result.lastInsertRowid);
 }
 
-export async function createDBOrderSong(title) {
-  const [result] = await pool.query(
-    "INSERT INTO order_song (title) VALUES (?)",
-    [title]
-  );
-  const id = result.insertId;
-  return getDBOrderSongById(id);
+export function createDBOrderSong(title) {
+  const stmt = db.prepare("INSERT INTO order_song (title) VALUES (?)");
+  const result = stmt.run(title);
+  return getDBOrderSongById(result.lastInsertRowid);
 }
 
-export async function updateDBSong(id, title, artist) {
+export function updateDBSong(id, title, artist) {
   let query = "UPDATE song_list SET";
   const params = [];
+
   if (title !== "") {
-    query += " title = ?,";
+    query += " song_title = ?,";
     params.push(title);
   }
   if (artist !== "") {
-    query += " artist = ?,";
+    query += " singer = ?,";
     params.push(artist);
   }
-  // Remove the trailing comma if there are valid updates
+
   if (params.length > 0) {
     query = query.slice(0, -1);
     query += " WHERE id = ?";
     params.push(id);
 
-    const [result] = await pool.query(query, params);
-    return result.affectedRows;
+    const stmt = db.prepare(query);
+    const result = stmt.run(...params);
+    return result.changes;
   } else {
-    // No valid updates, return 0 to indicate no changes made
     return 0;
   }
 }
 
-export async function deleteDBSong(id) {
-  const [result] = await pool.query("DELETE FROM song_list WHERE id = ?", [id]);
-  return result.affectedRows;
+export function deleteDBSong(id) {
+  const stmt = db.prepare("DELETE FROM song_list WHERE id = ?");
+  const result = stmt.run(id);
+  return result.changes;
 }
 
-export async function deleteDBAllSongs() {
-  const [result] = await pool.query("DELETE FROM song_list");
-  return result.affectedRows;
+export function deleteDBAllSongs() {
+  const stmt = db.prepare("DELETE FROM song_list");
+  const result = stmt.run();
+  return result.changes;
 }
 
-export async function deleteDBOrderSong(id) {
-  const [result] = await pool.query("DELETE FROM order_song WHERE id = ?", [
-    id,
-  ]);
-  return result.affectedRows;
+export function deleteDBOrderSong(id) {
+  const stmt = db.prepare("DELETE FROM order_song WHERE id = ?");
+  const result = stmt.run(id);
+  return result.changes;
 }
 
-export async function deleteDBOrderAllSongs() {
-  const [result] = await pool.query("DELETE FROM order_song");
-  return result.affectedRows;
+export function deleteDBOrderAllSongs() {
+  const stmt = db.prepare("DELETE FROM order_song");
+  const result = stmt.run();
+  return result.changes;
 }
 
-export async function updateDBNowPlaying(id, nowPlayingValue = 1) {
+export function updateDBNowPlaying(id, nowPlayingValue = 1) {
   try {
     if (nowPlayingValue !== 0) {
-      // Check if any record has now_playing as 1, if yes, update it to 0
-      const checkQuery =
-        "SELECT COUNT(*) AS count FROM song_list WHERE now_playing = 1";
-      const checkResult = await pool.query(checkQuery);
-      if (checkResult[0].count > 0) {
-        await pool.query(
+      const checkStmt = db.prepare(
+        "SELECT COUNT(*) AS count FROM song_list WHERE now_playing = 1"
+      );
+      const checkResult = checkStmt.get();
+
+      if (checkResult.count > 0) {
+        const resetStmt = db.prepare(
           "UPDATE song_list SET now_playing = 0 WHERE now_playing = 1"
         );
+        resetStmt.run();
       }
     }
 
-    // Update the specified ID's now_playing
-    const updateQuery = "UPDATE song_list SET now_playing = ? WHERE id = ?";
-    const updateResult = await pool.query(updateQuery, [nowPlayingValue, id]);
+    const updateStmt = db.prepare(
+      "UPDATE song_list SET now_playing = ? WHERE id = ?"
+    );
+    const updateResult = updateStmt.run(nowPlayingValue, id);
 
-    return updateResult.affectedRows;
+    return updateResult.changes;
   } catch (error) {
     throw new Error("Failed to update now playing status: " + error.message);
   }
