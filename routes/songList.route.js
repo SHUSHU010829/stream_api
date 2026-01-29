@@ -33,8 +33,6 @@ router.get("/:id", getSongById);
 
 router.post("/", createSong);
 
-router.put("/:id", updateSong);
-
 router.put("/start/:id", updateNowPlaying);
 
 router.put("/stop/:id", stopNowPlaying);
@@ -45,13 +43,15 @@ router.put("/sort/:id", updateSongOrder);
 
 router.put("/sort", updateBatchSongOrder);
 
-router.delete("/:id", deleteSong);
-
-router.delete("/", deleteAllSongs);
+router.put("/:id", updateSong);
 
 router.delete("/hard/:id", hardDeleteSong);
 
 router.delete("/hard", hardDeleteAllSongs);
+
+router.delete("/:id", deleteSong);
+
+router.delete("/", deleteAllSongs);
 
 router.post("/order/", createOrderSong);
 
