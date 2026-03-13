@@ -21,9 +21,12 @@ import {
   getOrderSongList,
   deleteOrderSong,
   deleteAllOrderSongs,
+  streamSongList,
 } from "../controllers/songList.controller.js";
 
 router.get("/", getSongList);
+
+router.get("/stream", streamSongList);
 
 router.get("/active", getActiveSongList);
 

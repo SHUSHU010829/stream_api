@@ -20,6 +20,44 @@ import {
   createDBOrderSong,
 } from "../models/songList.model.js";
 
+// SSE clients management
+const sseClients = [];
+
+async function broadcastSongList() {
+  try {
+    const songs = await getDBActiveSongList();
+    const data = `data: ${JSON.stringify(songs)}\n\n`;
+    sseClients.forEach((client) => client.write(data));
+  } catch (error) {
+    console.error("[SSE] broadcast error:", error.message);
+  }
+}
+
+export const streamSongList = async (req, res) => {
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+  });
+
+  // Send initial data immediately
+  try {
+    const songs = await getDBActiveSongList();
+    res.write(`data: ${JSON.stringify(songs)}\n\n`);
+  } catch (error) {
+    res.write(`data: []\n\n`);
+  }
+
+  sseClients.push(res);
+
+  req.on("close", () => {
+    const index = sseClients.indexOf(res);
+    if (index !== -1) {
+      sseClients.splice(index, 1);
+    }
+  });
+};
+
 export const getSongList = async (req, res) => {
   try {
     const songs = await getDBSongList();
@@ -74,6 +112,7 @@ export const createSong = async (req, res) => {
   try {
     const newSong = await createDBSong(title, artist);
     res.status(201).json(newSong);
+    broadcastSongList();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -87,6 +126,7 @@ export const createOrderSong = async (req, res) => {
   try {
     const newSong = await createDBOrderSong(title);
     res.status(201).json(newSong);
+    broadcastSongList();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -101,6 +141,7 @@ export const updateSong = async (req, res) => {
       throw createError(404, "找不到歌曲！");
     } else {
       res.status(200).json({ message: "歌曲更新成功！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -115,6 +156,7 @@ export const deleteSong = async (req, res) => {
       throw createError(404, "找不到歌曲！");
     } else {
       res.status(200).json({ message: "歌曲已歸檔！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -128,6 +170,7 @@ export const deleteAllSongs = async (req, res) => {
       throw createError(404, "沒有歌曲可以刪除！");
     } else {
       res.status(200).json({ message: "歌曲已歸檔！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -142,6 +185,7 @@ export const hardDeleteSong = async (req, res) => {
       throw createError(404, "找不到歌曲！");
     } else {
       res.status(200).json({ message: "歌曲永久刪除成功！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -155,6 +199,7 @@ export const hardDeleteAllSongs = async (req, res) => {
       throw createError(404, "沒有歌曲可以刪除！");
     } else {
       res.status(200).json({ message: "所有歌曲永久刪除成功！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -169,6 +214,7 @@ export const restoreSong = async (req, res) => {
       throw createError(404, "找不到歌曲！");
     } else {
       res.status(200).json({ message: "歌曲已恢復！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -184,6 +230,7 @@ export const updateSongOrder = async (req, res) => {
       throw createError(404, "找不到歌曲！");
     } else {
       res.status(200).json({ message: "排序更新成功！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -198,6 +245,7 @@ export const updateBatchSongOrder = async (req, res) => {
     }
     const count = await updateDBBatchSongOrder(songs);
     res.status(200).json({ message: `已更新 ${count} 首歌曲的排序！` });
+    broadcastSongList();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -211,6 +259,7 @@ export const deleteOrderSong = async (req, res) => {
       throw createError(404, "找不到歌曲！");
     } else {
       res.status(200).json({ message: "歌曲刪除成功！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -224,6 +273,7 @@ export const deleteAllOrderSongs = async (req, res) => {
       throw createError(404, "沒有歌曲可以刪除！");
     } else {
       res.status(200).json({ message: "歌曲刪除成功！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -238,6 +288,7 @@ export const stopNowPlaying = async (req, res) => {
       throw createError(404, "找不到歌曲或歌曲不在播放中！");
     } else {
       res.status(200).json({ message: "歌曲已停止播放！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -252,6 +303,7 @@ export const updateNowPlaying = async (req, res) => {
       throw createError(404, "找不到歌曲！");
     } else {
       res.status(200).json({ message: "歌曲開始播放！" });
+      broadcastSongList();
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
