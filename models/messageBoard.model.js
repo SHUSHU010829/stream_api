@@ -1,12 +1,15 @@
-import db from "../database.js";
+import supabase from "../database.js";
 
-export function getDBAllMsg() {
-  const stmt = db.prepare("SELECT * FROM message_board");
-  return stmt.all();
+export async function getDBAllMsg() {
+  const { data, error } = await supabase.from("message_board").select("*");
+  if (error) throw error;
+  return data;
 }
 
-export function createDBMsg(content) {
-  const stmt = db.prepare("INSERT INTO message_board (message) VALUES (?)");
-  const result = stmt.run(content);
+export async function createDBMsg(content) {
+  const { error } = await supabase
+    .from("message_board")
+    .insert({ message: content });
+  if (error) throw error;
   return getDBAllMsg();
 }
