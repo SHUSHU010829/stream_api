@@ -1,3 +1,4 @@
+import createError from "http-errors";
 import { getDBAllMsg, createDBMsg } from "../models/messageBoard.model.js";
 
 export const getAllMsg = async (req, res) => {

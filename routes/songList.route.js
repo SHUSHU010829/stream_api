@@ -32,6 +32,14 @@ router.get("/active", getActiveSongList);
 
 router.get("/history", getSongHistory);
 
+router.post("/order/", createOrderSong);
+
+router.get("/order/", getOrderSongList);
+
+router.delete("/order/:id", deleteOrderSong);
+
+router.delete("/order/", deleteAllOrderSongs);
+
 router.get("/:id", getSongById);
 
 router.post("/", createSong);
@@ -55,13 +63,5 @@ router.delete("/hard", hardDeleteAllSongs);
 router.delete("/:id", deleteSong);
 
 router.delete("/", deleteAllSongs);
-
-router.post("/order/", createOrderSong);
-
-router.get("/order/", getOrderSongList);
-
-router.delete("/order/:id", deleteOrderSong);
-
-router.delete("/order/", deleteAllOrderSongs);
 
 export default router;

@@ -13,13 +13,16 @@
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
+    "body-parser": "^1.20.6",
+    "colors": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "http-errors": "^2.0.1",
+    "tmi.js": "^1.8.5",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "colors": "^1.4.0",
     "nodemon": "^3.1.0"
   }
 }

@@ -194,6 +194,53 @@ export async function deleteDBOrderAllSongs() {
   return data.length;
 }
 
+export async function getDBActiveSongByTitle(title) {
+  const { data, error } = await supabase
+    .from("song_list")
+    .select("*")
+    .eq("status", 1)
+    .ilike("song_title", title.trim())
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function getDBNextActiveSortOrder() {
+  const { data, error } = await supabase
+    .from("song_list")
+    .select("sort_order")
+    .eq("status", 1)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return (data?.sort_order ?? 0) + 1;
+}
+
+export async function createDBSongFromRequest({
+  song_title,
+  singer,
+  requester_login,
+  requester_display_name,
+  request_id,
+  sort_order,
+}) {
+  const { data, error } = await supabase
+    .from("song_list")
+    .insert({
+      song_title,
+      singer,
+      requester_login,
+      requester_display_name,
+      request_id,
+      sort_order,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 export async function updateDBNowPlaying(id, nowPlayingValue = 1) {
   try {
     if (nowPlayingValue !== 0) {
